@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulir Rekrutmen Tutor - Bimbel Sainspiq</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: { brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af' } }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f1f5f9; }
+        .hidden { display: none !important; }
+        /* Smooth scrolling and transitions */
+        .smooth-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="text-gray-800 antialiased selection:bg-brand-100 selection:text-brand-700">
+
+    <div id="publicView" class="max-w-3xl mx-auto p-4 sm:p-6 pb-20">
+        
+        <div class="bg-white rounded-[28px] p-8 shadow-sm border border-slate-100 text-center mb-6 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-400 to-brand-600"></div>
+            <img id="displayLogo" src="" alt="Logo Bimbel" class="h-24 mx-auto object-contain mb-5 rounded-xl">
+            <h1 class="text-3xl font-bold text-slate-800 mb-2 tracking-tight">Formulir Rekrutmen Tutor</h1>
+            <p class="text-slate-500 text-sm sm:text-base max-w-lg mx-auto">Mari bergabung, berbagi ilmu, dan berkontribusi membangun masa depan pendidikan yang lebih baik bersama kami.</p>
+        </div>
+
+        <div id="announcementCard" class="hidden mb-6 bg-gradient-to-br from-brand-50 to-white border border-brand-100 rounded-[24px] p-6 shadow-sm relative overflow-hidden smooth-transition hover:shadow-md">
+            <div class="absolute -top-4 -right-4 p-4 opacity-5 transform rotate-12 pointer-events-none">
+                <i class="fas fa-bullhorn text-8xl text-brand-600"></i>
+            </div>
+            <div class="relative z-10 flex items-start gap-4">
+                <div class="bg-brand-100 text-brand-600 p-3 rounded-2xl shrink-0 mt-1">
+                    <i class="fas fa-info-circle text-xl"></i>
+                </div>
+                <div>
+                    <h2 id="announceTitleDisplay" class="text-lg font-bold text-slate-800 mb-1">Pengumuman</h2>
+                    <p id="announceContentDisplay" class="text-slate-600 text-sm leading-relaxed"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-8 space-y-4">
+            <h2 class="text-xl font-bold px-2 flex items-center gap-2 text-slate-800">
+                <i class="fas fa-briefcase text-brand-500"></i> Lowongan Tersedia
+            </h2>
+            <div id="vacanciesList" class="grid gap-4 sm:grid-cols-2">
+                </div>
+        </div>
+
+        <div class="bg-white rounded-[28px] p-6 sm:p-10 shadow-xl shadow-brand-500/5 border border-slate-100 relative">
+            <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow-md flex items-center gap-2">
+                <i class="fas fa-pen-alt"></i> Isi Form di Bawah
+            </div>
+
+            <form id="applyForm" onsubmit="submitForm(event)" class="space-y-6 mt-4">
+                
+                <div id="errorMsg" class="hidden bg-red-50 border border-red-100 text-red-600 p-4 rounded-2xl text-sm flex items-start gap-3">
+                    <i class="fas fa-exclamation-triangle mt-0.5 text-red-500"></i> <span id="errorText"></span>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-700">Pilih Lowongan <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <select id="inputVacancy" required class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all appearance-none cursor-pointer font-medium text-slate-700">
+                            <option value="">-- Silakan Pilih Posisi --</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-700 flex items-center gap-1.5"><i class="fas fa-user-circle text-slate-400"></i> Nama Lengkap <span class="text-red-500">*</span></label>
+                        <input type="text" id="inputName" required placeholder="Sesuai identitas asli" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-700 flex items-center gap-1.5"><i class="fab fa-whatsapp text-slate-400"></i> Nomor WhatsApp <span class="text-red-500">*</span></label>
+                        <input type="tel" id="inputWa" required placeholder="Contoh: 08123456789" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-700 flex items-center gap-1.5"><i class="fas fa-star text-slate-400"></i> Keahlian Bidang</label>
+                    <input type="text" id="inputSkills" placeholder="Contoh: Matematika SD, Baca Tulis, dll." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-700 flex items-center gap-1.5"><i class="fas fa-route text-slate-400"></i> Jarak ke Lokasi Mengajar (km) <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <input type="number" id="inputDistance" required step="0.1" min="0" placeholder="Pastikan dekat, maksimal 15 km" oninput="checkDistance(this)" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all pr-14 font-medium">
+                        <span class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-bold">KM</span>
+                    </div>
+                    <p id="distanceWarning" class="hidden text-red-500 text-xs mt-1.5 font-medium"><i class="fas fa-info-circle"></i> Peringatan: Jarak tidak boleh melebihi batas maksimal 15 km.</p>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-700 flex items-center gap-1.5"><i class="fas fa-map-marked-alt text-slate-400"></i> Daerah yang Dijangkau <span class="text-red-500">*</span></label>
+                    <textarea id="inputArea" required rows="2" placeholder="Contoh: Duren Sawit, Pasar Rebo, dll." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all resize-none"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-lg py-4 rounded-2xl transition-all shadow-[0_8px_20px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_25px_rgb(0,0,0,0.2)] flex items-center justify-center gap-3 mt-4 group">
+                    <i class="fab fa-whatsapp text-2xl text-green-400 group-hover:scale-110 transition-transform"></i> Kirim Data via WhatsApp
+                </button>
+            </form>
+        </div>
+
+        <div class="mt-12 text-center">
+            <button onclick="document.getElementById('loginModal').classList.remove('hidden')" class="text-slate-400 hover:text-brand-600 text-sm font-medium flex items-center justify-center gap-2 mx-auto transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
+                <i class="fas fa-sliders-h"></i> Konfigurasi Admin
+            </button>
+        </div>
+    </div>
+
+
+    <div id="adminView" class="hidden max-w-4xl mx-auto p-4 sm:p-6 pb-20">
+        
+        <div class="flex justify-between items-center bg-slate-800 text-white p-6 rounded-[28px] shadow-lg mb-8 relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 text-white/5 transform rotate-12 pointer-events-none">
+                <i class="fas fa-cogs text-9xl"></i>
+            </div>
+            <div class="relative z-10">
+                <h1 class="text-2xl font-bold flex items-center gap-3"><i class="fas fa-shield-alt text-brand-400"></i> Dashboard Admin</h1>
+                <p class="text-slate-300 text-sm mt-1">Pusat kendali formulir rekrutmen tutor</p>
+            </div>
+            <button onclick="showPublicView()" class="relative z-10 bg-white/10 hover:bg-white/20 px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold border border-white/10 backdrop-blur-sm">
+                <i class="fas fa-arrow-left"></i> <span class="hidden sm:inline">Tutup Admin</span>
+            </button>
+        </div>
+
+        <div class="space-y-8">
+            
+            <div class="bg-white rounded-[28px] p-6 sm:p-8 shadow-sm border border-slate-100">
+                <h2 class="text-xl font-bold mb-6 flex items-center gap-3 text-slate-800 border-b border-slate-100 pb-4">
+                    <i class="fas fa-globe text-brand-500"></i> Pengaturan Umum
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">URL Foto Logo <span class="text-slate-400 font-normal">(Link Gambar)</span></label>
+                        <input type="text" id="adminLogoUrl" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none font-medium text-slate-600">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Nomor WhatsApp Penerima Form</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fab fa-whatsapp text-green-500 text-lg"></i>
+                            </div>
+                            <input type="text" id="adminWaNumber" placeholder="Cth: 6281234567890" class="w-full p-3.5 pl-11 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none font-medium text-slate-600">
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2">Awali dengan 62 (Tanpa + atau spasi)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[28px] p-6 sm:p-8 shadow-sm border border-slate-100 border-l-4 border-l-brand-500">
+                <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                    <h2 class="text-xl font-bold flex items-center gap-3 text-slate-800">
+                        <i class="fas fa-bullhorn text-brand-500"></i> Card Pengumuman
+                    </h2>
+                    <label class="flex items-center gap-2 cursor-pointer bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+                        <input type="checkbox" id="adminAnnounceShow" class="w-5 h-5 text-brand-600 rounded focus:ring-brand-500 cursor-pointer">
+                        <span class="text-sm font-bold text-slate-700">Tampilkan</span>
+                    </label>
+                </div>
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Judul Pengumuman</label>
+                        <input type="text" id="adminAnnounceTitle" placeholder="Cth: Info Rekrutmen Gelombang 2" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none font-medium text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Isi Pesan Pengumuman</label>
+                        <textarea id="adminAnnounceContent" rows="3" placeholder="Tuliskan detail pengumuman di sini..." class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none resize-none text-sm text-slate-600"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[28px] p-6 sm:p-8 shadow-sm border border-slate-100">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 border-b border-slate-100 pb-4 gap-4">
+                    <h2 class="text-xl font-bold flex items-center gap-3 text-slate-800">
+                        <i class="fas fa-list-alt text-brand-500"></i> Kelola Lowongan
+                    </h2>
+                    <button onclick="addVacancy()" class="bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold py-2.5 px-5 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm border border-brand-200">
+                        <i class="fas fa-plus"></i> Tambah Posisi
+                    </button>
+                </div>
+                
+                <div id="adminVacanciesList" class="space-y-5">
+                    </div>
+            </div>
+
+            <div class="flex justify-end pt-4 sticky bottom-6 z-20">
+                <button onclick="saveAdminConfig()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 px-8 rounded-2xl transition-all shadow-[0_8px_20px_rgb(37,99,235,0.25)] hover:shadow-[0_8px_25px_rgb(37,99,235,0.35)] flex items-center gap-3 text-lg w-full sm:w-auto justify-center">
+                    <i class="fas fa-save"></i> Simpan Semua Pengaturan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loginModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-[28px] shadow-2xl w-full max-w-sm overflow-hidden transform scale-100 transition-transform">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fas fa-lock text-slate-400"></i> Otorisasi Admin</h3>
+                <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="text-slate-400 hover:text-red-500 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6 space-y-5">
+                <div>
+                    <label class="text-sm font-semibold text-slate-600 mb-2 block">Masukkan PIN Keamanan</label>
+                    <input type="password" id="loginPin" placeholder="Bawaan: admin123" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none text-center tracking-[0.5em] font-bold text-lg">
+                </div>
+                <p id="loginError" class="hidden text-red-500 text-sm font-medium flex items-center gap-1.5 justify-center"><i class="fas fa-times-circle"></i> PIN Tidak Valid!</p>
+                <button onclick="handleLogin()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3.5 rounded-xl transition-all shadow-md">Masuk Panel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Data Konfigurasi Default
+        const defaultConfig = {
+            logoUrl: "https://via.placeholder.com/400x120/EFF6FF/2563EB?text=Logo+Bimbel+Sainspiq",
+            waNumber: "6281234567890",
+            announcement: {
+                show: true,
+                title: "Pendaftaran Tutor Dibuka!",
+                content: "Silakan pilih posisi lowongan yang sesuai dengan keahlian Anda dan lengkapi data diri di bawah ini. Pastikan domisili Anda tidak lebih dari 15 KM dari lokasi bimbel kami."
+            },
+            vacancies: [
+                { id: 1, title: "Tutor Matematika & Calistung", description: "Membimbing siswa TK dan SD. Membutuhkan pengajar yang ramah anak dan sabar." },
+                { id: 2, title: "Tutor Bahasa Inggris", description: "Mengajar Bahasa Inggris dasar dengan metode yang interaktif dan menyenangkan." }
+            ]
+        };
+
+        // Ambil data dari penyimpanan (gabungkan dengan default jika ada struktur baru spt announcement)
+        let savedData = JSON.parse(localStorage.getItem('sainspiq_config'));
+        let config = savedData ? { ...defaultConfig, ...savedData, announcement: { ...defaultConfig.announcement, ...(savedData.announcement || {}) } } : defaultConfig;
+
+        // 2. Tampilan Publik
+        function renderPublicView() {
+            // Setup Logo
+            document.getElementById('displayLogo').src = config.logoUrl;
+            
+            // Setup Announcement
+            const annCard = document.getElementById('announcementCard');
+            if (config.announcement.show) {
+                document.getElementById('announceTitleDisplay').innerText = config.announcement.title;
+                document.getElementById('announceContentDisplay').innerText = config.announcement.content;
+                annCard.classList.remove('hidden');
+            } else {
+                annCard.classList.add('hidden');
+            }
+            
+            // Setup Vacancies
+            const vacancySelect = document.getElementById('inputVacancy');
+            const vacanciesList = document.getElementById('vacanciesList');
+            
+            vacancySelect.innerHTML = '<option value="">-- Silakan Pilih Posisi --</option>';
+            vacanciesList.innerHTML = '';
+
+            if (config.vacancies.length === 0) {
+                vacanciesList.innerHTML = '<div class="col-span-full p-4 bg-slate-50 rounded-2xl text-center text-slate-500 text-sm border border-slate-100">Belum ada lowongan tersedia saat ini.</div>';
+            }
+
+            config.vacancies.forEach(v => {
+                // Dropdown Form
+                const option = document.createElement('option');
+                option.value = v.title;
+                option.textContent = v.title;
+                vacancySelect.appendChild(option);
+
+                // Card Info Lowongan
+                vacanciesList.innerHTML += `
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm smooth-transition hover:-translate-y-1 hover:shadow-md hover:border-brand-300 group">
+                        <h3 class="font-bold text-slate-800 mb-2 group-hover:text-brand-600 transition-colors flex items-start gap-2">
+                            <i class="fas fa-check-circle text-brand-500 mt-1"></i> ${v.title}
+                        </h3>
+                        <p class="text-sm text-slate-500 leading-relaxed pl-6">${v.description}</p>
+                    </div>
+                `;
+            });
+        }
+
+        // 3. Logika Form & Validasi
+        function checkDistance(input) {
+            const warning = document.getElementById('distanceWarning');
+            if (parseFloat(input.value) > 15) {
+                input.classList.add('border-red-400', 'bg-red-50', 'text-red-700');
+                warning.classList.remove('hidden');
+            } else {
+                input.classList.remove('border-red-400', 'bg-red-50', 'text-red-700');
+                warning.classList.add('hidden');
+            }
+        }
+
+        function submitForm(event) {
+            event.preventDefault();
+            
+            const distance = parseFloat(document.getElementById('inputDistance').value);
+            const errorMsg = document.getElementById('errorMsg');
+            const errorText = document.getElementById('errorText');
+
+            if (distance > 15) {
+                errorText.innerText = "Mohon maaf, jarak tidak boleh melebihi batas 15 KM untuk kenyamanan bersama.";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+            errorMsg.classList.add('hidden');
+
+            const vacancy = document.getElementById('inputVacancy').value;
+            const name = document.getElementById('inputName').value;
+            const wa = document.getElementById('inputWa').value;
+            const skills = document.getElementById('inputSkills').value || "-";
+            const area = document.getElementById('inputArea').value;
+
+            // Template Pesan WA Terbaru
+            const message = `Halo kak saya tertarik dengan lowongan *${vacancy}* berikut data singkat saya di bawah ini:
+
+*Nama Lengkap:* ${name}
+*Nomor WA:* ${wa}
+*Keahlian Bidang:* ${skills}
+*Jarak Tempuh:* ${distance} km
+*Daerah Jangkauan:* ${area}`;
+
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/${config.waNumber}?text=${encodedMessage}`, '_blank');
+        }
+
+        // 4. Logika Admin
+        function handleLogin() {
+            const pin = document.getElementById('loginPin').value;
+            if (pin === 'admin123') { // PIN Statis
+                document.getElementById('loginModal').classList.add('hidden');
+                document.getElementById('publicView').classList.add('hidden');
+                document.getElementById('adminView').classList.remove('hidden');
+                document.getElementById('loginPin').value = '';
+                document.getElementById('loginError').classList.add('hidden');
+                renderAdminView();
+                window.scrollTo(0, 0);
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        function showPublicView() {
+            document.getElementById('adminView').classList.add('hidden');
+            document.getElementById('publicView').classList.remove('hidden');
+            renderPublicView();
+            window.scrollTo(0, 0);
+        }
+
+        function renderAdminView() {
+            document.getElementById('adminLogoUrl').value = config.logoUrl;
+            document.getElementById('adminWaNumber').value = config.waNumber;
+            
+            // Render Announcement
+            document.getElementById('adminAnnounceShow').checked = config.announcement.show;
+            document.getElementById('adminAnnounceTitle').value = config.announcement.title;
+            document.getElementById('adminAnnounceContent').value = config.announcement.content;
+
+            renderAdminVacancies();
+        }
+
+        function renderAdminVacancies() {
+            const container = document.getElementById('adminVacanciesList');
+            container.innerHTML = '';
+            
+            if (config.vacancies.length === 0) {
+                 container.innerHTML = '<p class="text-center text-slate-500 py-4 bg-slate-50 rounded-xl border border-slate-200">Belum ada daftar lowongan.</p>';
+                 return;
+            }
+
+            config.vacancies.forEach((vac, index) => {
+                container.innerHTML += `
+                    <div class="p-5 sm:p-6 border border-slate-200 rounded-2xl relative bg-slate-50 smooth-transition focus-within:ring-2 focus-within:ring-brand-200 focus-within:border-brand-400">
+                        
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="bg-brand-100 text-brand-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Lowongan ${index + 1}</span>
+                            <button onclick="removeVacancy(${vac.id})" class="text-slate-400 hover:text-white hover:bg-red-500 w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-sm bg-white border border-slate-200" title="Hapus Lowongan">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Nama Lowongan (Judul)</label>
+                                <input type="text" value="${vac.title}" onchange="updateVacancy(${vac.id}, 'title', this.value)" placeholder="Ketik nama posisi yang ditawarkan..." class="w-full p-4 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-base font-bold text-slate-800 shadow-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Deskripsi Persyaratan</label>
+                                <textarea onchange="updateVacancy(${vac.id}, 'description', this.value)" rows="3" placeholder="Tuliskan syarat dan deskripsi singkat pekerjaan..." class="w-full p-4 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm text-slate-600 resize-none shadow-sm">${vac.description}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addVacancy() {
+            config.vacancies.push({ id: Date.now(), title: '', description: '' });
+            renderAdminVacancies();
+        }
+
+        function removeVacancy(id) {
+            if(confirm("Yakin ingin menghapus lowongan ini?")) {
+                config.vacancies = config.vacancies.filter(v => v.id !== id);
+                renderAdminVacancies();
+            }
+        }
+
+        function updateVacancy(id, field, value) {
+            const index = config.vacancies.findIndex(v => v.id === id);
+            if (index !== -1) {
+                config.vacancies[index][field] = value;
+            }
+        }
+
+        function saveAdminConfig() {
+            // Ambil Nilai Umum
+            config.logoUrl = document.getElementById('adminLogoUrl').value;
+            config.waNumber = document.getElementById('adminWaNumber').value;
+            
+            // Ambil Nilai Pengumuman
+            config.announcement.show = document.getElementById('adminAnnounceShow').checked;
+            config.announcement.title = document.getElementById('adminAnnounceTitle').value;
+            config.announcement.content = document.getElementById('adminAnnounceContent').value;
+            
+            // Simpan ke LocalStorage 
+            localStorage.setItem('sainspiq_config', JSON.stringify(config));
+            
+            // Notifikasi Visual
+            const btn = event.currentTarget;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Tersimpan!';
+            btn.classList.replace('bg-brand-600', 'bg-green-500');
+            btn.classList.replace('hover:bg-brand-700', 'hover:bg-green-600');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.classList.replace('bg-green-500', 'bg-brand-600');
+                btn.classList.replace('hover:bg-green-600', 'hover:bg-brand-700');
+                showPublicView();
+            }, 800);
+        }
+
+        // Jalankan saat halaman dibuka
+        renderPublicView();
+
+    </script>
+</body>
+</html>
