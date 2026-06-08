@@ -8,49 +8,57 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: { sans: ['Poppins', 'sans-serif'] },
-                    colors: { brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af' } }
+                    colors: { brand: { 50:'#eff6ff',100:'#dbeafe',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af' } }
                 }
             }
         }
     </script>
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #f1f5f9; }
-        .hidden { display: none !important; }
-        .smooth-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .loader { border: 3px solid #e2e8f0; border-top: 3px solid #3b82f6; border-radius: 50%; width: 22px; height: 22px; animation: spin 0.7s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        body { font-family:'Poppins',sans-serif; background-color:#f1f5f9; }
+        .hidden { display:none !important; }
+        .smooth-transition { transition:all 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .loader { border:3px solid #e2e8f0; border-top:3px solid #3b82f6; border-radius:50%; width:28px; height:28px; animation:spin 0.7s linear infinite; display:inline-block; }
+        @keyframes spin { to { transform:rotate(360deg); } }
     </style>
 </head>
-<body class="text-gray-800 antialiased selection:bg-brand-100 selection:text-brand-700">
+<body class="text-gray-800 antialiased">
 
+<!-- LOADING SCREEN -->
+<div id="loadingScreen" class="fixed inset-0 bg-slate-50 flex flex-col items-center justify-center z-50 gap-4">
+    <div class="loader" style="width:40px;height:40px;border-width:4px"></div>
+    <p class="text-slate-500 font-medium text-sm">Memuat data...</p>
+</div>
 
+<!-- ERROR SCREEN -->
+<div id="errorScreen" class="hidden fixed inset-0 bg-slate-50 flex flex-col items-center justify-center z-50 gap-4 p-6">
+    <i class="fas fa-exclamation-triangle text-5xl text-red-400"></i>
+    <p class="text-slate-700 font-bold text-lg">Gagal memuat data</p>
+    <p id="errorDetail" class="text-slate-500 text-sm text-center max-w-sm"></p>
+    <button onclick="location.reload()" class="bg-brand-600 text-white px-6 py-2.5 rounded-xl font-semibold text-sm">Coba Lagi</button>
+</div>
 
-<!-- ===================== PUBLIC VIEW ===================== -->
+<!-- PUBLIC VIEW -->
 <div id="publicView" class="hidden max-w-3xl mx-auto p-4 sm:p-6 pb-20">
 
     <div class="bg-white rounded-[28px] p-8 shadow-sm border border-slate-100 text-center mb-6 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-400 to-brand-600"></div>
-        <img id="displayLogo" src="" alt="Logo Bimbel" class="h-24 mx-auto object-contain mb-5 rounded-xl">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-blue-600"></div>
+        <img id="displayLogo" src="" alt="Logo" class="h-24 mx-auto object-contain mb-5 rounded-xl">
         <h1 class="text-3xl font-bold text-slate-800 mb-2 tracking-tight">Formulir Rekrutmen Tutor</h1>
         <p class="text-slate-500 text-sm sm:text-base max-w-lg mx-auto">Mari bergabung, berbagi ilmu, dan berkontribusi membangun masa depan pendidikan yang lebih baik bersama kami.</p>
     </div>
 
-    <div id="announcementCard" class="hidden mb-6 bg-gradient-to-br from-brand-50 to-white border border-brand-100 rounded-[24px] p-6 shadow-sm relative overflow-hidden smooth-transition hover:shadow-md">
-        <div class="absolute -top-4 -right-4 p-4 opacity-5 transform rotate-12 pointer-events-none">
-            <i class="fas fa-bullhorn text-8xl text-brand-600"></i>
-        </div>
-        <div class="relative z-10 flex items-start gap-4">
-            <div class="bg-brand-100 text-brand-600 p-3 rounded-2xl shrink-0 mt-1">
+    <div id="announcementCard" class="hidden mb-6 bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-[24px] p-6 shadow-sm">
+        <div class="flex items-start gap-4">
+            <div class="bg-blue-100 text-blue-600 p-3 rounded-2xl shrink-0">
                 <i class="fas fa-info-circle text-xl"></i>
             </div>
             <div>
-                <h2 id="announceTitleDisplay" class="text-lg font-bold text-slate-800 mb-1">Pengumuman</h2>
+                <h2 id="announceTitleDisplay" class="text-lg font-bold text-slate-800 mb-1"></h2>
                 <p id="announceContentDisplay" class="text-slate-600 text-sm leading-relaxed"></p>
             </div>
         </div>
@@ -58,29 +66,29 @@
 
     <div class="mb-8 space-y-4">
         <h2 class="text-xl font-bold px-2 flex items-center gap-2 text-slate-800">
-            <i class="fas fa-briefcase text-brand-500"></i> Lowongan Tersedia
+            <i class="fas fa-briefcase text-blue-500"></i> Lowongan Tersedia
         </h2>
         <div id="vacanciesList" class="grid gap-4 sm:grid-cols-2"></div>
     </div>
 
-    <div class="bg-white rounded-[28px] p-6 sm:p-10 shadow-xl shadow-brand-500/5 border border-slate-100 relative">
+    <div class="bg-white rounded-[28px] p-6 sm:p-10 shadow-xl border border-slate-100 relative">
         <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow-md flex items-center gap-2">
             <i class="fas fa-pen-alt"></i> Isi Form di Bawah
         </div>
 
         <form id="applyForm" onsubmit="submitForm(event)" class="space-y-6 mt-4">
 
-            <div id="errorMsg" class="hidden bg-red-50 border border-red-100 text-red-600 p-4 rounded-2xl text-sm flex items-start gap-3">
-                <i class="fas fa-exclamation-triangle mt-0.5 text-red-500"></i> <span id="errorText"></span>
+            <div id="formError" class="hidden bg-red-50 border border-red-100 text-red-600 p-4 rounded-2xl text-sm flex items-start gap-3">
+                <i class="fas fa-exclamation-triangle mt-0.5"></i> <span id="formErrorText"></span>
             </div>
-            <div id="successMsg" class="hidden bg-green-50 border border-green-100 text-green-700 p-4 rounded-2xl text-sm flex items-start gap-3">
-                <i class="fas fa-check-circle mt-0.5 text-green-500"></i> <span id="successText"></span>
+            <div id="formSuccess" class="hidden bg-green-50 border border-green-100 text-green-700 p-4 rounded-2xl text-sm flex items-start gap-3">
+                <i class="fas fa-check-circle mt-0.5"></i> <span id="formSuccessText"></span>
             </div>
 
             <div class="space-y-2">
                 <label class="text-sm font-semibold text-slate-700">Pilih Lowongan <span class="text-red-500">*</span></label>
                 <div class="relative">
-                    <select id="inputVacancy" required class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all appearance-none cursor-pointer font-medium text-slate-700">
+                    <select id="inputVacancy" required class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all appearance-none font-medium text-slate-700">
                         <option value="">-- Silakan Pilih Posisi --</option>
                     </select>
                     <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
@@ -89,577 +97,426 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold text-slate-700 flex items-center gap-1.5"><i class="fas fa-user-circle text-slate-400"></i> Nama Lengkap <span class="text-red-500">*</span></label>
-                    <input type="text" id="inputName" required placeholder="Sesuai identitas asli" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all">
+                    <label class="text-sm font-semibold text-slate-700"><i class="fas fa-user-circle text-slate-400 mr-1"></i> Nama Lengkap <span class="text-red-500">*</span></label>
+                    <input type="text" id="inputName" required placeholder="Sesuai identitas asli" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all">
                 </div>
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold text-slate-700 flex items-center gap-1.5"><i class="fab fa-whatsapp text-slate-400"></i> Nomor WhatsApp <span class="text-red-500">*</span></label>
-                    <input type="tel" id="inputWa" required placeholder="Contoh: 08123456789" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all">
+                    <label class="text-sm font-semibold text-slate-700"><i class="fab fa-whatsapp text-slate-400 mr-1"></i> Nomor WhatsApp <span class="text-red-500">*</span></label>
+                    <input type="tel" id="inputWa" required placeholder="Contoh: 08123456789" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all">
                 </div>
             </div>
 
             <div class="space-y-2">
-                <label class="text-sm font-semibold text-slate-700 flex items-center gap-1.5"><i class="fas fa-star text-slate-400"></i> Keahlian Bidang</label>
-                <input type="text" id="inputSkills" placeholder="Contoh: Matematika SD, Baca Tulis, dll." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all">
+                <label class="text-sm font-semibold text-slate-700"><i class="fas fa-star text-slate-400 mr-1"></i> Keahlian Bidang</label>
+                <input type="text" id="inputSkills" placeholder="Contoh: Matematika SD, Baca Tulis, dll." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all">
             </div>
 
             <div class="space-y-2">
-                <label class="text-sm font-semibold text-slate-700 flex items-center gap-1.5"><i class="fas fa-route text-slate-400"></i> Jarak ke Lokasi Mengajar (km) <span class="text-red-500">*</span></label>
+                <label class="text-sm font-semibold text-slate-700"><i class="fas fa-route text-slate-400 mr-1"></i> Jarak ke Lokasi Mengajar (km) <span class="text-red-500">*</span></label>
                 <div class="relative">
-                    <input type="number" id="inputDistance" required step="0.1" min="0" placeholder="Pastikan dekat, maksimal 15 km" oninput="checkDistance(this)" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all pr-14 font-medium">
+                    <input type="number" id="inputDistance" required step="0.1" min="0" placeholder="Maks. 15 km" oninput="checkDistance(this)" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all pr-14 font-medium">
                     <span class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-bold">KM</span>
                 </div>
-                <p id="distanceWarning" class="hidden text-red-500 text-xs mt-1.5 font-medium"><i class="fas fa-info-circle"></i> Peringatan: Jarak tidak boleh melebihi batas maksimal 15 km.</p>
+                <p id="distanceWarning" class="hidden text-red-500 text-xs mt-1 font-medium"><i class="fas fa-info-circle"></i> Jarak tidak boleh melebihi 15 km.</p>
             </div>
 
             <div class="space-y-2">
-                <label class="text-sm font-semibold text-slate-700 flex items-center gap-1.5"><i class="fas fa-map-marked-alt text-slate-400"></i> Daerah yang Dijangkau <span class="text-red-500">*</span></label>
-                <textarea id="inputArea" required rows="2" placeholder="Contoh: Duren Sawit, Pasar Rebo, dll." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all resize-none"></textarea>
+                <label class="text-sm font-semibold text-slate-700"><i class="fas fa-map-marked-alt text-slate-400 mr-1"></i> Daerah yang Dijangkau <span class="text-red-500">*</span></label>
+                <textarea id="inputArea" required rows="2" placeholder="Contoh: Duren Sawit, Pasar Rebo, dll." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"></textarea>
             </div>
 
-            <button type="submit" id="submitBtn" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-lg py-4 rounded-2xl transition-all shadow-[0_8px_20px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_25px_rgb(0,0,0,0.2)] flex items-center justify-center gap-3 mt-4 group">
-                <i class="fab fa-whatsapp text-2xl text-green-400 group-hover:scale-110 transition-transform"></i> Kirim Data via WhatsApp
+            <button type="submit" id="submitBtn" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-lg py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-3 mt-4">
+                <i class="fab fa-whatsapp text-2xl text-green-400"></i> Kirim Data via WhatsApp
             </button>
         </form>
     </div>
 
-    <div class="mt-12 text-center flex flex-col items-center gap-3">
-        <button onclick="document.getElementById('loginModal').classList.remove('hidden')" class="text-slate-400 hover:text-brand-600 text-sm font-medium flex items-center justify-center gap-2 mx-auto transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
+    <div class="mt-10 text-center">
+        <button onclick="document.getElementById('loginModal').classList.remove('hidden')" class="text-slate-400 hover:text-blue-600 text-sm font-medium flex items-center justify-center gap-2 mx-auto transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
             <i class="fas fa-sliders-h"></i> Konfigurasi Admin
         </button>
-
     </div>
 </div>
 
-
-<!-- ===================== ADMIN VIEW ===================== -->
+<!-- ADMIN VIEW -->
 <div id="adminView" class="hidden max-w-4xl mx-auto p-4 sm:p-6 pb-20">
 
-    <div class="flex justify-between items-center bg-slate-800 text-white p-6 rounded-[28px] shadow-lg mb-8 relative overflow-hidden">
-        <div class="absolute -right-10 -top-10 text-white/5 transform rotate-12 pointer-events-none">
-            <i class="fas fa-cogs text-9xl"></i>
-        </div>
-        <div class="relative z-10">
-            <h1 class="text-2xl font-bold flex items-center gap-3"><i class="fas fa-shield-alt text-brand-400"></i> Dashboard Admin</h1>
+    <div class="flex justify-between items-center bg-slate-800 text-white p-6 rounded-[28px] shadow-lg mb-8">
+        <div>
+            <h1 class="text-2xl font-bold flex items-center gap-3"><i class="fas fa-shield-alt text-blue-400"></i> Dashboard Admin</h1>
             <p class="text-slate-300 text-sm mt-1">Pusat kendali formulir rekrutmen tutor</p>
         </div>
-        <div class="relative z-10 flex items-center gap-2">
-            <button onclick="showApplicants()" class="bg-white/10 hover:bg-white/20 px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold border border-white/10">
+        <div class="flex items-center gap-2">
+            <button onclick="toggleApplicants()" class="bg-white/10 hover:bg-white/20 px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold border border-white/10">
                 <i class="fas fa-users"></i> <span class="hidden sm:inline">Pendaftar</span>
             </button>
             <button onclick="showPublicView()" class="bg-white/10 hover:bg-white/20 px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold border border-white/10">
-                <i class="fas fa-arrow-left"></i> <span class="hidden sm:inline">Tutup Admin</span>
+                <i class="fas fa-arrow-left"></i> <span class="hidden sm:inline">Tutup</span>
             </button>
         </div>
     </div>
 
-    <!-- Panel Pendaftar -->
-    <div id="applicantsPanel" class="hidden mb-8 bg-white rounded-[28px] p-6 sm:p-8 shadow-sm border border-slate-100">
-        <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
-            <h2 class="text-xl font-bold flex items-center gap-3 text-slate-800">
-                <i class="fas fa-users text-brand-500"></i> Daftar Pendaftar
-            </h2>
-            <button onclick="loadApplicants()" class="text-sm text-brand-600 hover:text-brand-800 font-semibold flex items-center gap-1.5">
-                <i class="fas fa-sync-alt"></i> Refresh
-            </button>
+    <div id="applicantsPanel" class="hidden mb-8 bg-white rounded-[28px] p-6 shadow-sm border border-slate-100">
+        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-4">
+            <h2 class="text-xl font-bold flex items-center gap-2 text-slate-800"><i class="fas fa-users text-blue-500"></i> Daftar Pendaftar</h2>
+            <button onclick="loadApplicants()" class="text-sm text-blue-600 hover:text-blue-800 font-semibold"><i class="fas fa-sync-alt mr-1"></i>Refresh</button>
         </div>
-        <div id="applicantsTable" class="overflow-x-auto">
-            <div class="flex items-center justify-center py-10 text-slate-400 gap-3">
-                <div class="loader"></div> Memuat data...
-            </div>
-        </div>
+        <div id="applicantsTable" class="overflow-x-auto"></div>
     </div>
 
-    <div class="space-y-8" id="settingsPanel">
-
+    <div class="space-y-8">
         <div class="bg-white rounded-[28px] p-6 sm:p-8 shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold mb-6 flex items-center gap-3 text-slate-800 border-b border-slate-100 pb-4">
-                <i class="fas fa-globe text-brand-500"></i> Pengaturan Umum
+                <i class="fas fa-globe text-blue-500"></i> Pengaturan Umum
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">URL Foto Logo</label>
-                    <input type="text" id="adminLogoUrl" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none font-medium text-slate-600">
+                    <input type="text" id="adminLogoUrl" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none font-medium text-slate-600">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">Nomor WhatsApp Penerima</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <i class="fab fa-whatsapp text-green-500 text-lg"></i>
-                        </div>
-                        <input type="text" id="adminWaNumber" placeholder="62812..." class="w-full p-3.5 pl-11 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none font-medium text-slate-600">
-                    </div>
-                    <p class="text-xs text-slate-400 mt-2">Awali dengan 62 (tanpa + atau spasi)</p>
+                    <input type="text" id="adminWaNumber" placeholder="628..." class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none font-medium text-slate-600">
+                    <p class="text-xs text-slate-400 mt-1">Awali dengan 62, tanpa + atau spasi</p>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-[28px] p-6 sm:p-8 shadow-sm border border-slate-100 border-l-4 border-l-brand-500">
+        <div class="bg-white rounded-[28px] p-6 sm:p-8 shadow-sm border border-slate-100 border-l-4 border-l-blue-500">
             <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
-                <h2 class="text-xl font-bold flex items-center gap-3 text-slate-800">
-                    <i class="fas fa-bullhorn text-brand-500"></i> Card Pengumuman
-                </h2>
+                <h2 class="text-xl font-bold flex items-center gap-3 text-slate-800"><i class="fas fa-bullhorn text-blue-500"></i> Card Pengumuman</h2>
                 <label class="flex items-center gap-2 cursor-pointer bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
-                    <input type="checkbox" id="adminAnnounceShow" class="w-5 h-5 text-brand-600 rounded focus:ring-brand-500 cursor-pointer">
+                    <input type="checkbox" id="adminAnnounceShow" class="w-5 h-5 text-blue-600 rounded cursor-pointer">
                     <span class="text-sm font-bold text-slate-700">Tampilkan</span>
                 </label>
             </div>
-            <div class="space-y-5">
+            <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Judul Pengumuman</label>
-                    <input type="text" id="adminAnnounceTitle" placeholder="Cth: Info Rekrutmen Gelombang 2" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none font-medium text-slate-800">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Judul</label>
+                    <input type="text" id="adminAnnounceTitle" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none font-medium text-slate-800">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Isi Pesan Pengumuman</label>
-                    <textarea id="adminAnnounceContent" rows="3" placeholder="Detail pengumuman..." class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none resize-none text-sm text-slate-600"></textarea>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Isi Pengumuman</label>
+                    <textarea id="adminAnnounceContent" rows="3" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none resize-none text-sm text-slate-600"></textarea>
                 </div>
             </div>
         </div>
 
         <div class="bg-white rounded-[28px] p-6 sm:p-8 shadow-sm border border-slate-100">
-            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 border-b border-slate-100 pb-4 gap-4">
-                <h2 class="text-xl font-bold flex items-center gap-3 text-slate-800">
-                    <i class="fas fa-list-alt text-brand-500"></i> Kelola Lowongan
-                </h2>
-                <button onclick="addVacancy()" class="bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold py-2.5 px-5 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm border border-brand-200">
-                    <i class="fas fa-plus"></i> Tambah Posisi
+            <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                <h2 class="text-xl font-bold flex items-center gap-3 text-slate-800"><i class="fas fa-list-alt text-blue-500"></i> Kelola Lowongan</h2>
+                <button onclick="addVacancy()" class="bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-2.5 px-5 rounded-xl transition-colors flex items-center gap-2 text-sm border border-blue-200">
+                    <i class="fas fa-plus"></i> Tambah
                 </button>
             </div>
             <div id="adminVacanciesList" class="space-y-5"></div>
         </div>
 
-        <div class="flex justify-end pt-4 sticky bottom-6 z-20">
-            <button onclick="saveAdminConfig()" id="saveBtn" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 px-8 rounded-2xl transition-all shadow-[0_8px_20px_rgb(37,99,235,0.25)] hover:shadow-[0_8px_25px_rgb(37,99,235,0.35)] flex items-center gap-3 text-lg w-full sm:w-auto justify-center">
+        <div class="sticky bottom-6 z-20">
+            <button onclick="saveAdminConfig()" id="saveBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-2xl transition-all shadow-lg flex items-center gap-3 text-lg w-full sm:w-auto justify-center">
                 <i class="fas fa-save"></i> Simpan Semua Pengaturan
             </button>
         </div>
     </div>
 </div>
 
-
-<!-- ===================== LOGIN MODAL ===================== -->
+<!-- LOGIN MODAL -->
 <div id="loginModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-[28px] shadow-2xl w-full max-w-sm overflow-hidden">
         <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-            <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fas fa-lock text-slate-400"></i> Otorisasi Admin</h3>
-            <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="text-slate-400 hover:text-red-500 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50"><i class="fas fa-times"></i></button>
+            <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fas fa-lock text-slate-400"></i> Login Admin</h3>
+            <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="text-slate-400 hover:text-red-500 w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50"><i class="fas fa-times"></i></button>
         </div>
-        <div class="p-6 space-y-5">
-            <div>
-                <label class="text-sm font-semibold text-slate-600 mb-2 block">Masukkan PIN Keamanan</label>
-                <input type="password" id="loginPin" placeholder="Bawaan: admin123" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none text-center tracking-[0.5em] font-bold text-lg" onkeydown="if(event.key==='Enter') handleLogin()">
-            </div>
-            <p id="loginError" class="hidden text-red-500 text-sm font-medium flex items-center gap-1.5 justify-center"><i class="fas fa-times-circle"></i> PIN Tidak Valid!</p>
-            <button onclick="handleLogin()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3.5 rounded-xl transition-all shadow-md">Masuk Panel</button>
+        <div class="p-6 space-y-4">
+            <input type="password" id="loginPin" placeholder="Masukkan PIN" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-center tracking-[0.5em] font-bold text-lg" onkeydown="if(event.key==='Enter') handleLogin()">
+            <p id="loginError" class="hidden text-red-500 text-sm font-medium text-center"><i class="fas fa-times-circle mr-1"></i>PIN Tidak Valid!</p>
+            <button onclick="handleLogin()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3.5 rounded-xl transition-all">Masuk Panel</button>
         </div>
     </div>
 </div>
 
 <script>
-// ============================================================
-//  SUPABASE INIT
-// ============================================================
-let supabase = null;
-let config = {};
-let vacancies = [];
-
+// ── KONFIGURASI ──────────────────────────────────────────────
+const SB_URL   = 'https://ombvanakmuudxrgdyjpx.supabase.co';
+const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tYnZhbmFrbXV1ZHhyZ2R5anB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4ODg2MTMsImV4cCI6MjA5NjQ2NDYxM30.X34vr1pUS8pAnMPd3gw2Fx98lkKJp5rT_DF25zcPXE4';
 const ADMIN_PIN = 'Sainspiq2026';
-const SB_URL = 'https://ombvanakmuudxrgdyjpx.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tYnZhbmFrbXV1ZHhyZ2R5anB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4ODg2MTMsImV4cCI6MjA5NjQ2NDYxM30.X34vr1pUS8pAnMPd3gw2Fx98lkKJp5rT_DF25zcPXE4';
 
-function getCredentials() {
-    return { url: SB_URL, key: SB_KEY };
-}
+let sb, config = {}, vacancies = [], adminVacancies = [];
 
-async function initSupabase(silent = false) {
-    const { url, key } = getCredentials();
+// ── BOOT ─────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
     try {
-        supabase = window.supabase.createClient(url, key);
-        await loadAndRenderPublic();
-    } catch (e) {
-        document.getElementById('publicView').innerHTML = `<div class="max-w-md mx-auto mt-20 p-6 bg-red-50 rounded-2xl text-red-700 text-center"><i class="fas fa-exclamation-triangle text-3xl mb-3"></i><p class="font-bold">Gagal konek ke Supabase</p><p class="text-sm mt-1">${e.message}</p></div>`;
-        document.getElementById('publicView').classList.remove('hidden');
+        sb = window.supabase.createClient(SB_URL, SB_KEY);
+        await Promise.all([loadConfig(), loadVacancies()]);
+        renderPublicView();
+        show('publicView');
+    } catch(e) {
+        document.getElementById('errorDetail').textContent = e.message;
+        show('errorScreen');
+    } finally {
+        hide('loadingScreen');
     }
-}
+});
 
-function resetSupabase() {}
+function show(id) { document.getElementById(id).classList.remove('hidden'); }
+function hide(id) { document.getElementById(id).classList.add('hidden'); }
+function esc(s)   { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-function resetSupabase() {
-    if (confirm('Hapus konfigurasi Supabase dan mulai ulang?')) {
-        localStorage.removeItem('sb_url');
-        localStorage.removeItem('sb_key');
-        location.reload();
-    }
-}
-
-// ============================================================
-//  LOAD DATA DARI SUPABASE
-// ============================================================
+// ── DATA ─────────────────────────────────────────────────────
 async function loadConfig() {
-    const { data, error } = await supabase.from('sainspiq_config').select('*');
+    const { data, error } = await sb.from('sainspiq_config').select('*');
     if (error) throw error;
     config = {};
-    data.forEach(row => { config[row.key] = row.value; });
+    (data||[]).forEach(r => config[r.key] = r.value);
 }
 
 async function loadVacancies() {
-    const { data, error } = await supabase
-        .from('sainspiq_vacancies')
-        .select('*')
-        .eq('is_active', true)
-        .order('id', { ascending: true });
+    const { data, error } = await sb.from('sainspiq_vacancies').select('*').eq('is_active', true).order('id');
     if (error) throw error;
     vacancies = data || [];
 }
 
-async function loadAndRenderPublic() {
-    try {
-        await Promise.all([loadConfig(), loadVacancies()]);
-        renderPublicView();
-        document.getElementById('publicView').classList.remove('hidden');
-    } catch (e) {
-        alert('Gagal memuat data dari Supabase: ' + e.message);
-    }
-}
-
-// ============================================================
-//  RENDER PUBLIC VIEW
-// ============================================================
+// ── PUBLIC VIEW ───────────────────────────────────────────────
 function renderPublicView() {
     document.getElementById('displayLogo').src = config.logo_url || '';
 
-    const announceShow = config.announce_show === 'true';
-    const annCard = document.getElementById('announcementCard');
-    if (announceShow) {
-        document.getElementById('announceTitleDisplay').innerText = config.announce_title || '';
+    if (config.announce_show === 'true') {
+        document.getElementById('announceTitleDisplay').innerText   = config.announce_title || '';
         document.getElementById('announceContentDisplay').innerText = config.announce_content || '';
-        annCard.classList.remove('hidden');
+        show('announcementCard');
     } else {
-        annCard.classList.add('hidden');
+        hide('announcementCard');
     }
 
-    const vacancySelect = document.getElementById('inputVacancy');
-    const vacanciesList = document.getElementById('vacanciesList');
-    vacancySelect.innerHTML = '<option value="">-- Silakan Pilih Posisi --</option>';
-    vacanciesList.innerHTML = '';
+    const sel  = document.getElementById('inputVacancy');
+    const list = document.getElementById('vacanciesList');
+    sel.innerHTML  = '<option value="">-- Silakan Pilih Posisi --</option>';
+    list.innerHTML = '';
 
-    if (vacancies.length === 0) {
-        vacanciesList.innerHTML = '<div class="col-span-full p-4 bg-slate-50 rounded-2xl text-center text-slate-500 text-sm border border-slate-100">Belum ada lowongan tersedia saat ini.</div>';
+    if (!vacancies.length) {
+        list.innerHTML = '<div class="col-span-full p-4 bg-slate-50 rounded-2xl text-center text-slate-500 text-sm border border-slate-100">Belum ada lowongan tersedia.</div>';
+        return;
     }
 
     vacancies.forEach(v => {
         const opt = document.createElement('option');
-        opt.value = v.title;
-        opt.textContent = v.title;
-        vacancySelect.appendChild(opt);
+        opt.value = v.title; opt.textContent = v.title;
+        sel.appendChild(opt);
 
-        vacanciesList.innerHTML += `
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm smooth-transition hover:-translate-y-1 hover:shadow-md hover:border-brand-300 group">
-                <h3 class="font-bold text-slate-800 mb-2 group-hover:text-brand-600 transition-colors flex items-start gap-2">
-                    <i class="fas fa-check-circle text-brand-500 mt-1"></i> ${escHtml(v.title)}
-                </h3>
-                <p class="text-sm text-slate-500 leading-relaxed pl-6">${escHtml(v.description || '')}</p>
-            </div>
-        `;
+        list.innerHTML += `
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:-translate-y-1 hover:shadow-md hover:border-blue-300 smooth-transition group" style="transition:all .3s">
+            <h3 class="font-bold text-slate-800 mb-2 group-hover:text-blue-600 transition-colors flex items-start gap-2">
+                <i class="fas fa-check-circle text-blue-500 mt-1"></i> ${esc(v.title)}
+            </h3>
+            <p class="text-sm text-slate-500 leading-relaxed pl-6">${esc(v.description||'')}</p>
+        </div>`;
     });
 }
 
-// ============================================================
-//  FORM SUBMIT → SIMPAN KE SUPABASE + BUKA WA
-// ============================================================
+// ── FORM ──────────────────────────────────────────────────────
 function checkDistance(input) {
-    const warning = document.getElementById('distanceWarning');
-    if (parseFloat(input.value) > 15) {
-        input.classList.add('border-red-400', 'bg-red-50', 'text-red-700');
-        warning.classList.remove('hidden');
-    } else {
-        input.classList.remove('border-red-400', 'bg-red-50', 'text-red-700');
-        warning.classList.add('hidden');
-    }
+    const over = parseFloat(input.value) > 15;
+    document.getElementById('distanceWarning').classList.toggle('hidden', !over);
+    input.classList.toggle('border-red-400', over);
+    input.classList.toggle('bg-red-50', over);
 }
 
-async function submitForm(event) {
-    event.preventDefault();
-
-    const distance = parseFloat(document.getElementById('inputDistance').value);
-    const errorMsg = document.getElementById('errorMsg');
-    const errorText = document.getElementById('errorText');
-    const successMsg = document.getElementById('successMsg');
-
-    if (distance > 15) {
-        errorText.innerText = 'Mohon maaf, jarak tidak boleh melebihi batas 15 KM.';
-        errorMsg.classList.remove('hidden');
-        successMsg.classList.add('hidden');
-        return;
+async function submitForm(e) {
+    e.preventDefault();
+    const dist = parseFloat(document.getElementById('inputDistance').value);
+    if (dist > 15) {
+        document.getElementById('formErrorText').innerText = 'Jarak tidak boleh melebihi 15 KM.';
+        show('formError'); hide('formSuccess'); return;
     }
-    errorMsg.classList.add('hidden');
+    hide('formError');
 
-    const vacancy  = document.getElementById('inputVacancy').value;
-    const name     = document.getElementById('inputName').value;
-    const wa       = document.getElementById('inputWa').value;
-    const skills   = document.getElementById('inputSkills').value || '-';
-    const area     = document.getElementById('inputArea').value;
+    const vacancy = document.getElementById('inputVacancy').value;
+    const name    = document.getElementById('inputName').value;
+    const wa      = document.getElementById('inputWa').value;
+    const skills  = document.getElementById('inputSkills').value || '-';
+    const area    = document.getElementById('inputArea').value;
 
-    // Simpan ke Supabase
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
-    btn.innerHTML = '<div class="loader"></div> Menyimpan...';
+    btn.innerHTML = '<div class="loader" style="width:22px;height:22px;border-width:3px;border-top-color:white;margin-right:8px"></div> Menyimpan...';
 
     try {
-        const { error } = await supabase.from('sainspiq_applicants').insert([{
-            vacancy, name, wa, skills, distance, area
-        }]);
-        if (error) throw error;
-    } catch (e) {
-        // Tetap lanjut buka WA walau DB gagal, cukup notif
-        console.warn('DB insert failed:', e.message);
+        await sb.from('sainspiq_applicants').insert([{ vacancy, name, wa, skills, distance: dist, area }]);
+    } catch(err) {
+        console.warn('Insert gagal:', err.message);
     }
 
     btn.disabled = false;
     btn.innerHTML = '<i class="fab fa-whatsapp text-2xl text-green-400"></i> Kirim Data via WhatsApp';
 
-    // Buka WA
-    const message = `Halo kak saya tertarik dengan lowongan *${vacancy}* berikut data singkat saya di bawah ini:\n\n*Nama Lengkap:* ${name}\n*Nomor WA:* ${wa}\n*Keahlian Bidang:* ${skills}\n*Jarak Tempuh:* ${distance} km\n*Daerah Jangkauan:* ${area}`;
-    window.open(`https://wa.me/${config.wa_number || ''}?text=${encodeURIComponent(message)}`, '_blank');
+    const msg = `Halo kak saya tertarik dengan lowongan *${vacancy}* berikut data singkat saya:\n\n*Nama:* ${name}\n*WA:* ${wa}\n*Keahlian:* ${skills}\n*Jarak:* ${dist} km\n*Area:* ${area}`;
+    window.open(`https://wa.me/${config.wa_number||''}?text=${encodeURIComponent(msg)}`, '_blank');
 
-    document.getElementById('successMsg').classList.remove('hidden');
-    document.getElementById('successText').innerText = 'Data berhasil disimpan ke database! WhatsApp sudah terbuka.';
+    document.getElementById('formSuccessText').innerText = 'Data tersimpan! WhatsApp sudah terbuka.';
+    show('formSuccess');
     document.getElementById('applyForm').reset();
 }
 
-// ============================================================
-//  ADMIN - LOGIN & VIEW
-// ============================================================
+// ── ADMIN LOGIN ───────────────────────────────────────────────
 function handleLogin() {
-    const pin = document.getElementById('loginPin').value;
-    if (pin === ADMIN_PIN) {
-        document.getElementById('loginModal').classList.add('hidden');
-        document.getElementById('publicView').classList.add('hidden');
-        document.getElementById('adminView').classList.remove('hidden');
+    if (document.getElementById('loginPin').value === ADMIN_PIN) {
+        hide('loginModal'); hide('publicView'); show('adminView');
+        hide('applicantsPanel');
         document.getElementById('loginPin').value = '';
-        document.getElementById('loginError').classList.add('hidden');
-        document.getElementById('applicantsPanel').classList.add('hidden');
+        hide('loginError');
         renderAdminView();
-        window.scrollTo(0, 0);
+        window.scrollTo(0,0);
     } else {
-        document.getElementById('loginError').classList.remove('hidden');
+        show('loginError');
     }
 }
 
-function showPublicView() {
-    document.getElementById('adminView').classList.add('hidden');
-    document.getElementById('publicView').classList.remove('hidden');
-    loadAndRenderPublic();
-    window.scrollTo(0, 0);
+async function showPublicView() {
+    hide('adminView');
+    show('loadingScreen');
+    try {
+        await Promise.all([loadConfig(), loadVacancies()]);
+        renderPublicView();
+        show('publicView');
+    } catch(e) { alert('Gagal memuat: '+e.message); }
+    hide('loadingScreen');
+    window.scrollTo(0,0);
 }
 
-// ============================================================
-//  ADMIN - RENDER SETTINGS
-// ============================================================
-let adminVacancies = []; // local copy untuk admin edit
-
+// ── ADMIN RENDER ──────────────────────────────────────────────
 function renderAdminView() {
-    document.getElementById('adminLogoUrl').value     = config.logo_url || '';
-    document.getElementById('adminWaNumber').value    = config.wa_number || '';
-    document.getElementById('adminAnnounceShow').checked  = config.announce_show === 'true';
-    document.getElementById('adminAnnounceTitle').value   = config.announce_title || '';
-    document.getElementById('adminAnnounceContent').value = config.announce_content || '';
-
-    // Clone vacancies untuk admin
-    adminVacancies = vacancies.map(v => ({ ...v }));
+    document.getElementById('adminLogoUrl').value        = config.logo_url || '';
+    document.getElementById('adminWaNumber').value       = config.wa_number || '';
+    document.getElementById('adminAnnounceShow').checked = config.announce_show === 'true';
+    document.getElementById('adminAnnounceTitle').value  = config.announce_title || '';
+    document.getElementById('adminAnnounceContent').value= config.announce_content || '';
+    adminVacancies = vacancies.map(v => ({...v}));
     renderAdminVacancies();
 }
 
 function renderAdminVacancies() {
-    const container = document.getElementById('adminVacanciesList');
-    container.innerHTML = '';
-
-    if (adminVacancies.length === 0) {
-        container.innerHTML = '<p class="text-center text-slate-500 py-4 bg-slate-50 rounded-xl border border-slate-200">Belum ada daftar lowongan.</p>';
+    const c = document.getElementById('adminVacanciesList');
+    c.innerHTML = '';
+    if (!adminVacancies.length) {
+        c.innerHTML = '<p class="text-center text-slate-500 py-4 bg-slate-50 rounded-xl border">Belum ada lowongan.</p>';
         return;
     }
-
-    adminVacancies.forEach((vac, index) => {
-        const div = document.createElement('div');
-        div.className = 'p-5 sm:p-6 border border-slate-200 rounded-2xl relative bg-slate-50 smooth-transition focus-within:ring-2 focus-within:ring-brand-200';
-        div.innerHTML = `
+    adminVacancies.forEach((v, i) => {
+        const d = document.createElement('div');
+        d.className = 'p-5 border border-slate-200 rounded-2xl bg-slate-50';
+        d.innerHTML = `
             <div class="flex justify-between items-center mb-4">
-                <span class="bg-brand-100 text-brand-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Lowongan ${index + 1}</span>
-                <button onclick="removeVacancy(${index})" class="text-slate-400 hover:text-white hover:bg-red-500 w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-sm bg-white border border-slate-200" title="Hapus">
+                <span class="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full">Lowongan ${i+1}</span>
+                <button onclick="removeVacancy(${i})" class="text-slate-400 hover:bg-red-500 hover:text-white w-8 h-8 rounded-lg flex items-center justify-center transition-colors border border-slate-200 bg-white">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
-            <div class="space-y-4">
+            <div class="space-y-3">
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Nama Lowongan</label>
-                    <input type="text" value="${escHtml(vac.title)}" oninput="adminVacancies[${index}].title = this.value" class="w-full p-4 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-bold text-slate-800 shadow-sm">
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Nama Lowongan</label>
+                    <input type="text" value="${esc(v.title)}" oninput="adminVacancies[${i}].title=this.value" class="w-full p-3.5 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-800">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Deskripsi</label>
-                    <textarea oninput="adminVacancies[${index}].description = this.value" rows="3" class="w-full p-4 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm text-slate-600 resize-none shadow-sm">${escHtml(vac.description || '')}</textarea>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Deskripsi</label>
+                    <textarea oninput="adminVacancies[${i}].description=this.value" rows="2" class="w-full p-3.5 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm text-slate-600 resize-none">${esc(v.description||'')}</textarea>
                 </div>
-            </div>
-        `;
-        container.appendChild(div);
+            </div>`;
+        c.appendChild(d);
     });
 }
 
 function addVacancy() {
-    adminVacancies.push({ id: null, title: '', description: '', is_active: true });
+    adminVacancies.push({ id: null, title:'', description:'', is_active: true });
     renderAdminVacancies();
 }
 
-function removeVacancy(index) {
-    if (confirm('Yakin ingin menghapus lowongan ini?')) {
-        adminVacancies.splice(index, 1);
-        renderAdminVacancies();
-    }
+function removeVacancy(i) {
+    if (confirm('Hapus lowongan ini?')) { adminVacancies.splice(i,1); renderAdminVacancies(); }
 }
 
-// ============================================================
-//  ADMIN - SIMPAN KE SUPABASE
-// ============================================================
+// ── ADMIN SAVE ────────────────────────────────────────────────
 async function saveAdminConfig() {
     const btn = document.getElementById('saveBtn');
     btn.disabled = true;
-    btn.innerHTML = '<div class="loader" style="border-top-color:white"></div> Menyimpan...';
+    btn.innerHTML = '<div class="loader" style="width:22px;height:22px;border-width:3px;border-top-color:white;margin-right:8px"></div> Menyimpan...';
 
     try {
-        // Update config rows (upsert)
-        const configRows = [
-            { key: 'logo_url',         value: document.getElementById('adminLogoUrl').value },
-            { key: 'wa_number',        value: document.getElementById('adminWaNumber').value },
-            { key: 'announce_show',    value: document.getElementById('adminAnnounceShow').checked ? 'true' : 'false' },
-            { key: 'announce_title',   value: document.getElementById('adminAnnounceTitle').value },
-            { key: 'announce_content', value: document.getElementById('adminAnnounceContent').value },
+        const rows = [
+            { key:'logo_url',         value: document.getElementById('adminLogoUrl').value },
+            { key:'wa_number',        value: document.getElementById('adminWaNumber').value },
+            { key:'announce_show',    value: document.getElementById('adminAnnounceShow').checked ? 'true':'false' },
+            { key:'announce_title',   value: document.getElementById('adminAnnounceTitle').value },
+            { key:'announce_content', value: document.getElementById('adminAnnounceContent').value },
         ];
+        const { error: e1 } = await sb.from('sainspiq_config').upsert(rows, { onConflict:'key' });
+        if (e1) throw e1;
 
-        const { error: cfgErr } = await supabase
-            .from('sainspiq_config')
-            .upsert(configRows, { onConflict: 'key' });
-        if (cfgErr) throw cfgErr;
+        // Nonaktifkan semua dulu
+        await sb.from('sainspiq_vacancies').update({ is_active: false }).gte('id', 0);
 
-        // Kelola lowongan
-        // 1. Matikan semua yg ada dulu (soft delete)
-        const { error: deactErr } = await supabase
-            .from('sainspiq_vacancies')
-            .update({ is_active: false })
-            .neq('id', 0); // update semua
-        if (deactErr) throw deactErr;
-
-        // 2. Upsert yang masih ada di admin list
+        // Upsert yang masih ada
         for (const v of adminVacancies) {
             if (v.id) {
-                // Update existing
-                await supabase.from('sainspiq_vacancies').upsert({
-                    id: v.id,
-                    title: v.title,
-                    description: v.description,
-                    is_active: true
-                });
+                await sb.from('sainspiq_vacancies').update({ title:v.title, description:v.description, is_active:true }).eq('id', v.id);
             } else {
-                // Insert baru
-                await supabase.from('sainspiq_vacancies').insert({
-                    title: v.title,
-                    description: v.description,
-                    is_active: true
-                });
+                await sb.from('sainspiq_vacancies').insert({ title:v.title, description:v.description, is_active:true });
             }
         }
 
-        // Refresh config & vacancies di memory
         await Promise.all([loadConfig(), loadVacancies()]);
 
-        btn.innerHTML = '<i class="fas fa-check"></i> Tersimpan!';
-        btn.classList.replace('bg-brand-600', 'bg-green-500');
-
+        btn.innerHTML = '<i class="fas fa-check mr-2"></i>Tersimpan!';
+        btn.classList.replace('bg-blue-600','bg-green-500');
         setTimeout(() => {
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i> Simpan Semua Pengaturan';
-            btn.classList.replace('bg-green-500', 'bg-brand-600');
+            btn.innerHTML = '<i class="fas fa-save mr-2"></i>Simpan Semua Pengaturan';
+            btn.classList.replace('bg-green-500','bg-blue-600');
             showPublicView();
         }, 1000);
 
-    } catch (e) {
-        alert('Gagal menyimpan: ' + e.message);
+    } catch(e) {
+        alert('Gagal menyimpan: '+e.message);
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-save"></i> Simpan Semua Pengaturan';
+        btn.innerHTML = '<i class="fas fa-save mr-2"></i>Simpan Semua Pengaturan';
     }
 }
 
-// ============================================================
-//  ADMIN - TABEL PENDAFTAR
-// ============================================================
-function showApplicants() {
-    const panel = document.getElementById('applicantsPanel');
-    panel.classList.toggle('hidden');
-    if (!panel.classList.contains('hidden')) loadApplicants();
+// ── PENDAFTAR ─────────────────────────────────────────────────
+function toggleApplicants() {
+    const p = document.getElementById('applicantsPanel');
+    if (p.classList.contains('hidden')) { show('applicantsPanel'); loadApplicants(); }
+    else hide('applicantsPanel');
 }
 
 async function loadApplicants() {
-    const container = document.getElementById('applicantsTable');
-    container.innerHTML = '<div class="flex items-center justify-center py-10 text-slate-400 gap-3"><div class="loader"></div> Memuat data...</div>';
-
-    const { data, error } = await supabase
-        .from('sainspiq_applicants')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        container.innerHTML = `<p class="text-red-500 text-sm p-4">${error.message}</p>`;
-        return;
-    }
-
-    if (!data || data.length === 0) {
-        container.innerHTML = '<p class="text-center text-slate-500 py-8">Belum ada pendaftar.</p>';
-        return;
-    }
-
-    container.innerHTML = `
-        <table class="w-full text-sm text-left min-w-[700px]">
-            <thead>
-                <tr class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider">
-                    <th class="px-4 py-3 rounded-tl-xl font-bold">#</th>
-                    <th class="px-4 py-3 font-bold">Nama</th>
-                    <th class="px-4 py-3 font-bold">WhatsApp</th>
-                    <th class="px-4 py-3 font-bold">Lowongan</th>
-                    <th class="px-4 py-3 font-bold">Keahlian</th>
-                    <th class="px-4 py-3 font-bold">Jarak</th>
-                    <th class="px-4 py-3 rounded-tr-xl font-bold">Waktu</th>
-                </tr>
-            </thead>
+    const c = document.getElementById('applicantsTable');
+    c.innerHTML = '<div class="flex items-center gap-3 py-8 justify-center text-slate-400"><div class="loader"></div> Memuat...</div>';
+    const { data, error } = await sb.from('sainspiq_applicants').select('*').order('created_at', { ascending:false });
+    if (error) { c.innerHTML = `<p class="text-red-500 p-4 text-sm">${error.message}</p>`; return; }
+    if (!data?.length) { c.innerHTML = '<p class="text-center text-slate-500 py-8">Belum ada pendaftar.</p>'; return; }
+    c.innerHTML = `
+        <table class="w-full text-sm text-left min-w-[680px]">
+            <thead><tr class="bg-slate-50 text-slate-500 text-xs uppercase">
+                <th class="px-4 py-3 font-bold">#</th>
+                <th class="px-4 py-3 font-bold">Nama</th>
+                <th class="px-4 py-3 font-bold">WhatsApp</th>
+                <th class="px-4 py-3 font-bold">Lowongan</th>
+                <th class="px-4 py-3 font-bold">Jarak</th>
+                <th class="px-4 py-3 font-bold">Waktu</th>
+            </tr></thead>
             <tbody class="divide-y divide-slate-100">
-                ${data.map((r, i) => `
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-4 py-3 text-slate-400 font-mono">${i + 1}</td>
-                        <td class="px-4 py-3 font-semibold text-slate-800">${escHtml(r.name || '-')}</td>
-                        <td class="px-4 py-3">
-                            <a href="https://wa.me/${r.wa}" target="_blank" class="text-green-600 hover:underline font-medium flex items-center gap-1">
-                                <i class="fab fa-whatsapp"></i> ${escHtml(r.wa || '-')}
-                            </a>
-                        </td>
-                        <td class="px-4 py-3 text-slate-600">${escHtml(r.vacancy || '-')}</td>
-                        <td class="px-4 py-3 text-slate-500">${escHtml(r.skills || '-')}</td>
-                        <td class="px-4 py-3"><span class="bg-brand-50 text-brand-700 px-2 py-0.5 rounded-lg font-bold text-xs">${r.distance || 0} km</span></td>
-                        <td class="px-4 py-3 text-slate-400 text-xs">${new Date(r.created_at).toLocaleString('id-ID')}</td>
-                    </tr>
-                `).join('')}
+                ${data.map((r,i) => `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-4 py-3 text-slate-400">${i+1}</td>
+                    <td class="px-4 py-3 font-semibold text-slate-800">${esc(r.name)}</td>
+                    <td class="px-4 py-3"><a href="https://wa.me/${r.wa}" target="_blank" class="text-green-600 hover:underline"><i class="fab fa-whatsapp mr-1"></i>${esc(r.wa)}</a></td>
+                    <td class="px-4 py-3 text-slate-600 text-xs">${esc(r.vacancy)}</td>
+                    <td class="px-4 py-3"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-lg font-bold text-xs">${r.distance} km</span></td>
+                    <td class="px-4 py-3 text-slate-400 text-xs">${new Date(r.created_at).toLocaleString('id-ID')}</td>
+                </tr>`).join('')}
             </tbody>
-        </table>
-    `;
+        </table>`;
 }
-
-// ============================================================
-//  UTILS
-// ============================================================
-function escHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// BOOT
-(async () => {
-    await initSupabase();
-})();
 </script>
 </body>
 </html>
